@@ -1,24 +1,20 @@
 // src/components/Chat.tsx
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Container, Grid, CircularProgress, LinearProgress } from "@mui/material";
+import { TextField, Button, Container, Grid, LinearProgress } from "@mui/material";
 import Message from "./Message";
 import { MessageDto } from "../models/MessageDto";
 import axios from "axios";
-import { threadId } from "worker_threads";
+import DragAndDropInput from "./DragandDropInput";
 
-const Chat: React.FC = () => {
-  const [isWaiting, setIsWaiting] = useState<boolean>(true);
+const Chat: React.FC<any> = ({isWaiting, setIsWaiting} : {
+  isWaiting: boolean,
+  setIsWaiting: (isWaiting: boolean) => void
+}) => {
+  
   const [messages, setMessages] = useState<Array<MessageDto>>(new Array<MessageDto>());
   const [input, setInput] = useState<string>("");
   const [assistant, setAssistant] = useState<any>(null);
   const [thread, setThread] = useState<any>(null);
-  const [file, setFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    if(file != null && thread === null && assistant === null) {
-        initChatBot();
-    }
-  }, [file]);
 
   useEffect(() => {
     setMessages([
@@ -29,17 +25,21 @@ const Chat: React.FC = () => {
     ]);
   }, [assistant]);
 
-  const initChatBot = async () => {
+  const initChatBot = async (file: File) => {
+    if (!file) {
+      return;
+    }
+    debugger;
     setIsWaiting(true);
     const formData = new FormData();
     formData.append('file', file!);
 
-    axios.post('http://localhost:8080/initAssistant', formData).then(response => {
-        console.log(response);
-        setAssistant((response.data! as any).assistant!);
-        setThread((response.data! as any).thread);
-        setIsWaiting(false);
-    })
+    // axios.post('http://localhost:8080/initAssistant', formData).then(response => {
+    //     console.log(response);
+    //     setAssistant((response.data! as any).assistant!);
+    //     setThread((response.data! as any).thread);
+    //     setIsWaiting(false);
+    // })
   };
 
   const createNewMessage = (content: string, isUser: boolean) => {
@@ -75,14 +75,6 @@ const Chat: React.FC = () => {
     }
   };
 
-  const handleFileChange = (event: any) => {
-    setFile(event.target.files[0]);
-  };
-
-  const handleSubmit = async () => {
-    await initChatBot();
-  }
-
   return (
     <Container>
       <Grid container direction="column" spacing={2} paddingBottom={5}>
@@ -112,10 +104,7 @@ const Chat: React.FC = () => {
         )}
       </Grid>
 
-      <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit" disabled={!file}>Initialize</button>
-      </form>
+
     </Container>
   );
 };

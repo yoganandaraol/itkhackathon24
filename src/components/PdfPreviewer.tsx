@@ -4,7 +4,7 @@ import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 
-const PDFPreviewer: React.FC<{ fileUrl: string }> = ({ fileUrl }) => {
+const PDFPreviewer: React.FC<{ fileUrl: string | null }> = ({ fileUrl }) => {
     const [numPages, setNumPages] = useState<number | null>(null);
     const [pageNumber, setPageNumber] = useState(1);
 
@@ -14,6 +14,10 @@ const PDFPreviewer: React.FC<{ fileUrl: string }> = ({ fileUrl }) => {
 
     const toolbarPluginInstance = toolbarPlugin();
     const { Toolbar } = toolbarPluginInstance;
+
+    if(fileUrl === null) {
+        return <div>No file selected</div>
+    }
 
     return (
         <div>
@@ -59,8 +63,8 @@ const PDFPreviewer: React.FC<{ fileUrl: string }> = ({ fileUrl }) => {
                     }}
                 </Toolbar>
             </div>
-            <div style={{ height: '750px' }}>
-                <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.6.172/build/pdf.worker.min.js">
+            <div style={{ justifyContent:'center',  height: '100%' }}>
+                <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js">
                     <Viewer fileUrl={fileUrl} plugins={[toolbarPluginInstance]} />
                 </Worker>
             </div>

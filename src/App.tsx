@@ -2,10 +2,27 @@ import React, { useState } from 'react';
 import Chat from './components/Chat';
 import PDFPreviewer from './components/PdfPreviewer';
 import { Box } from '@mui/material';
+import DragAndDropInput from './components/DragandDropInput';
 
 const App: React.FC = () => {
-  const fileUrl = 'Contract of Sale - Good 1.pdf';
+  const [isWaiting, setIsWaiting] = useState<boolean>(true);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const initChatBot = async (file: File) => {
+    if (!file) {
+      return;
+    }
+    setFileName(file.name);
+    setIsWaiting(true);
+    const formData = new FormData();
+    formData.append('file', file!);
 
+    // axios.post('http://localhost:8080/initAssistant', formData).then(response => {
+    //     console.log(response);
+    //     setAssistant((response.data! as any).assistant!);
+    //     setThread((response.data! as any).thread);
+    //     setIsWaiting(false);
+    // })
+  };
   return (
   <>
 <div className="App">
@@ -14,15 +31,15 @@ const App: React.FC = () => {
             </header>
             <main className="main-container">
                 <div className="drag-drop">
-                    <p>Div with drag drop file feature</p>
+                  <DragAndDropInput submit={initChatBot}/>
                 </div>
                 <div className="content-container">
                 <Box sx={{ display: 'flex', flexDirection:'row', width: '100%' }}>
                   <Box sx={{width:'50%'}}>
-                      <PDFPreviewer fileUrl={fileUrl} />
+                      <PDFPreviewer fileUrl={fileName} />
                     </Box>
                     <Box sx={{width:'50%'}}>
-                      <Chat />
+                      <Chat isWaiting={isWaiting} setIsWaiting={setIsWaiting}/>
                     </Box>
                     </Box>
                 </div>
